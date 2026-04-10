@@ -354,11 +354,11 @@ if surface_df is not None and not surface_df.empty:
             else:
                 surface_colors[i, j] = [0.23, 0.51, 0.96, 0.7]  # Blue fresh
 
-    # Build customdata for 3D hover — pre-allocate object array to avoid
-    # numpy dtype-inference issues when mixing strings and numerics via dstack
+    # Build customdata for 3D hover using explicit reshape+broadcast
+    # to avoid numpy misinterpreting list-of-lists as (1, N) instead of (N, M)
     _cd = np.empty((len(date_labels), len(h_labels), 3), dtype=object)
-    _cd[:, :, 0] = [[date_labels[i]] * len(h_labels) for i in range(len(date_labels))]
-    _cd[:, :, 1] = [h_labels] * len(date_labels)
+    _cd[:, :, 0] = np.array(date_labels, dtype=object).reshape(-1, 1)  # (n_dates,1) → (n_dates,n_horiz)
+    _cd[:, :, 1] = np.array(h_labels,    dtype=object).reshape(1, -1)  # (1,n_horiz) → (n_dates,n_horiz)
     _cd[:, :, 2] = streaks.values
 
     fig_3d = go.Figure()
