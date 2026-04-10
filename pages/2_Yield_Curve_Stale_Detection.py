@@ -98,17 +98,28 @@ def parse_date_from_filename(filename: str):
 
 def parse_date_flexible(val):
     """Parse a date from various formats."""
+    if val is None or (isinstance(val, float) and np.isnan(val)):
+        return None
     if isinstance(val, (datetime, pd.Timestamp)):
         return pd.Timestamp(val)
+    # Excel stores dates as serial numbers (float/int); handle before string conversion
+    if isinstance(val, (int, float, np.integer, np.floating)):
+        try:
+            return pd.Timestamp('1899-12-30') + pd.Timedelta(days=int(val))
+        except Exception:
+            return None
     s = str(val).strip()
-    for fmt in ('%d%m%Y', '%d/%m/%Y', '%Y-%m-%d', '%Y%m%d', '%m/%d/%Y', '%d-%m-%Y'):
+    if not s or s.lower() in ('nan', 'nat', 'none', 'n/a', ''):
+        return None
+    for fmt in ('%d%m%Y', '%d/%m/%Y', '%Y-%m-%d', '%Y%m%d', '%m/%d/%Y',
+                '%d-%m-%Y', '%d.%m.%Y', '%Y/%m/%d', '%d %b %Y', '%d %B %Y'):
         try:
             return pd.Timestamp(datetime.strptime(s, fmt))
         except ValueError:
             continue
     try:
         return pd.Timestamp(pd.to_datetime(s, dayfirst=True))
-    except:
+    except Exception:
         return None
 
 
