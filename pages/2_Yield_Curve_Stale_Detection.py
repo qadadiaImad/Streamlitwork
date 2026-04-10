@@ -233,7 +233,7 @@ if "Single" in input_mode and uploaded is not None:
                 horizon_map[col] = hval
         raw = raw[[c for c in raw.columns if c in horizon_map]]
         raw = raw.rename(columns=horizon_map)
-        raw = raw[sorted(raw.columns)]
+        raw = raw.sort_index(axis=1)
         raw = raw.apply(pd.to_numeric, errors='coerce')
         surface_df = raw
 
