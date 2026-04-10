@@ -354,7 +354,13 @@ if surface_df is not None and not surface_df.empty:
             else:
                 surface_colors[i, j] = [0.23, 0.51, 0.96, 0.7]  # Blue fresh
 
-    # Create custom colorscale from stale_intensity
+    # Build customdata for 3D hover — pre-allocate object array to avoid
+    # numpy dtype-inference issues when mixing strings and numerics via dstack
+    _cd = np.empty((len(date_labels), len(h_labels), 3), dtype=object)
+    _cd[:, :, 0] = [[date_labels[i]] * len(h_labels) for i in range(len(date_labels))]
+    _cd[:, :, 1] = [h_labels] * len(date_labels)
+    _cd[:, :, 2] = streaks.values
+
     fig_3d = go.Figure()
 
     # Fresh surface
@@ -379,11 +385,7 @@ if surface_df is not None and not surface_df.empty:
             "Streak: %{customdata[2]}d"
             "<extra></extra>"
         ),
-        customdata=np.dstack([
-            np.array([[date_labels[i]] * len(h_labels) for i in range(len(date_labels))]),
-            np.array([h_labels] * len(date_labels)),
-            streaks.values,
-        ]),
+        customdata=_cd,
     ))
 
     fig_3d.update_layout(
