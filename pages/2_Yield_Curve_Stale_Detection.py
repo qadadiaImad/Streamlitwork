@@ -275,7 +275,7 @@ elif "Multiple" in input_mode and uploaded:
 
     if curves:
         surface_df = pd.DataFrame(curves).T.sort_index()
-        surface_df = surface_df[sorted(surface_df.columns)]
+        surface_df = surface_df.sort_index(axis=1)
 
 
 # ============================================================
@@ -297,10 +297,10 @@ if surface_df is not None and not surface_df.empty:
     streaks = compute_stale_streaks(surface_df, tolerance=tolerance)
 
     total_points = surface_df.size
-    stale_date_count = int(stale_mask.sum().sum())
-    stale_hor_count = int(stale_horizon.sum().sum())
-    stale_total = int(stale_combined.sum().sum())
-    streak_alerts = int((streaks >= streak_threshold).sum().sum())
+    stale_date_count = int(stale_mask.values.sum())
+    stale_hor_count = int(stale_horizon.values.sum())
+    stale_total = int(stale_combined.values.sum())
+    streak_alerts = int((streaks.values >= streak_threshold).sum())
 
     c1, c2, c3, c4, c5 = st.columns(5)
     with c1: render_stat_card(f"{len(surface_df)}", "Dates")
