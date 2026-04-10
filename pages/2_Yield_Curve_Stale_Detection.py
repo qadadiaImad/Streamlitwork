@@ -376,8 +376,7 @@ if surface_df is not None and not surface_df.empty:
             [0.7, '#f97316'],   # Orange
             [1.0, '#ef4444'],   # Stale — red
         ],
-        colorbar=dict(title="Stale<br>streak", tickvals=[0, 0.5, 1],
-                      ticktext=["Fresh", f"{max_streak//2}d", f"{int(max_streak)}d"]),
+        colorbar=dict(title="Stale streak"),
         hovertemplate=(
             "Date: %{customdata[0]}<br>"
             "Horizon: %{customdata[1]}<br>"
